@@ -31,6 +31,7 @@ bool Scene1::OnCreate() {
 	projectionMatrix = ndc * ortho;
 	
 	/// Turn on the SDL imaging subsystem
+	SDL_Init(SDL_INIT_VIDEO);
 	IMG_Init(IMG_INIT_PNG);
 
 	// Set player image to PacMan
@@ -42,6 +43,7 @@ bool Scene1::OnCreate() {
 	game->getPlayer()->setImage(image);
 	game->getPlayer()->setTexture(texture);
 
+
 	// Set up characters, choose good values for the constructor
 	// or use the defaults, like this
 	blinky = new Character();
@@ -50,7 +52,7 @@ bool Scene1::OnCreate() {
 		return false;
 	}
 
-	image = IMG_Load("Blinky.png");
+	image = IMG_Load("Run.png");
 	texture = SDL_CreateTextureFromSurface(renderer, image);
 	if (image == nullptr) {
 		std::cerr << "Can't open the image\n";
@@ -100,37 +102,40 @@ void Scene1::Update(const float deltaTime) {
 	steering = steering_algorithm->getSteering();
 	myNPC->Update(deltaTime, steering);
 
+
 	// Update player
 	game->getPlayer()->Update(deltaTime);
 }
 
 void Scene1::Render() {
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	SDL_Rect square{ 0,0,32,64 };
+	SDL_Rect square2{ 10,10,32,64 };
+	SDL_SetRenderDrawColor(renderer, 2, 0, 0, 0);
 	SDL_RenderClear(renderer);
 
 	// render any npc's
 	blinky->Render(0.15f);
 
 	///////////////////////////////
-	SDL_Rect square;
+
 	Vec3 screenCoords;
 	int w, h;
 	float scale = 0.15f;
+
 
 	SDL_QueryTexture(myNPC->getTexture(), nullptr, nullptr, &w, &h);
 	w = static_cast<int>(w * scale);
 	h = static_cast<int>(h * scale);
 
 	screenCoords = projectionMatrix * myNPC->getPos();
-	square.x = static_cast<int>(screenCoords.x - 0.5f * w);
+	square.x = static_cast<int>( screenCoords.x - 0.5f * w);
 	square.y = static_cast<int>(screenCoords.y - 0.5f * h);
 	square.w = w;
 	square.h = h;
 
 	float orientation = myNPC->getOrientation() * 180.0f / M_PI;
-	SDL_RenderCopyEx(renderer, myNPC->getTexture(), nullptr, &square, 
-	 orientation, nullptr, SDL_FLIP_NONE);
-	///////////////////////////////
+	SDL_RenderCopyEx(renderer, myNPC->getTexture(), &square, &square2, orientation
+	,nullptr, SDL_FLIP_NONE );
 	
 	// render the player
 	game->RenderPlayer(0.10f);

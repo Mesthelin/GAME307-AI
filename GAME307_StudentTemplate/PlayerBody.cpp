@@ -16,7 +16,9 @@ bool PlayerBody::OnCreate()
         std::cerr << "Can't open the image" << std::endl;
         return false;
     }
+    
     return true;
+    
 }
 
 void PlayerBody::Render( float scale )
