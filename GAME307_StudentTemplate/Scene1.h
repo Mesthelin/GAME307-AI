@@ -20,7 +20,9 @@ private:
     Matrix4 inverseProjection;
 
 	Character* blinky;
-	StaticBody* myNPC;
+	StaticBody* spyGuy;
+	StaticBody* blackHat;
+	KinematicBody* testNPC;
 
 public:
 	Scene1(SDL_Window* sdlWindow, GameManager* game_);

@@ -5,7 +5,11 @@
 
 class Seek : public SteeringBehaviour {
 protected:
-	Body *target;
+	Body* target;
+	// SteeringBehaviour has "character" and "result"
+	// so "target" is only needed here
+
+	float maxAcceleration;
 	
 public:
 	Seek(Body *character_, Body *target_);

@@ -11,7 +11,8 @@ Scene1::Scene1(SDL_Window* sdlWindow_, GameManager* game_){
 
 	// create a NPC
 	blinky = nullptr;
-	myNPC = NULL;
+	spyGuy = NULL;
+	blackHat = NULL;
 }
 
 Scene1::~Scene1(){
@@ -31,7 +32,6 @@ bool Scene1::OnCreate() {
 	projectionMatrix = ndc * ortho;
 	
 	/// Turn on the SDL imaging subsystem
-	SDL_Init(SDL_INIT_VIDEO);
 	IMG_Init(IMG_INIT_PNG);
 
 	// Set player image to PacMan
@@ -43,7 +43,6 @@ bool Scene1::OnCreate() {
 	game->getPlayer()->setImage(image);
 	game->getPlayer()->setTexture(texture);
 
-
 	// Set up characters, choose good values for the constructor
 	// or use the defaults, like this
 	blinky = new Character();
@@ -52,7 +51,7 @@ bool Scene1::OnCreate() {
 		return false;
 	}
 
-	image = IMG_Load("Run.png");
+	image = IMG_Load("Blinky.png");
 	texture = SDL_CreateTextureFromSurface(renderer, image);
 	if (image == nullptr) {
 		std::cerr << "Can't open the image\n";
@@ -63,13 +62,13 @@ bool Scene1::OnCreate() {
 		SDL_FreeSurface(image);
 	}
 
-	///////////////////////////////
-	Vec3 position = Vec3();
+	////////////////////////////////////////////////////////////////////
+	Vec3 position = Vec3(15.0f, 8.0f, 0.0f);
 	float orientation = 0.0f;
 	float maxAcceleration = 3.5f;
 	float maxSpeed = 3.5f;
 	float maxRotation = 0.0f;
-	myNPC = new StaticBody(position, orientation, maxSpeed, maxRotation);
+	spyGuy = new StaticBody(position, orientation, maxSpeed, maxRotation);
 
 	image = IMG_Load("Clyde.png");
 	texture = SDL_CreateTextureFromSurface(renderer, image);
@@ -78,10 +77,30 @@ bool Scene1::OnCreate() {
 		return false;
 	}
 	else {
-		myNPC->setTexture(texture);
+		spyGuy->setTexture(texture);
 		SDL_FreeSurface(image);
 	}
-	///////////////////////////////
+	////////////////////////////////////////////////////////////////////
+	{
+		Vec3 position = Vec3(8.0f, 4.0f, 0.0f);
+		float orientation = 0.0f;
+		float maxAcceleration = 3.5f;
+		float maxSpeed = 3.5f;
+		float maxRotation = 0.0f;
+		blackHat = new StaticBody(position, orientation, maxSpeed, maxRotation);
+
+		image = IMG_Load("blackHat.png");
+		texture = SDL_CreateTextureFromSurface(renderer, image);
+		if (image == nullptr) {
+			std::cerr << "Can't open the image\n";
+			return false;
+		}
+		else {
+			blackHat->setTexture(texture);
+			SDL_FreeSurface(image);
+		}
+	}
+	////////////////////////////////////////////////////////////////////
 	// end of character set ups
 
 	return true;
@@ -93,50 +112,73 @@ void Scene1::Update(const float deltaTime) {
 	// Calculate and apply any steering for npc's
 	blinky->Update(deltaTime);
 
-	// Clydes speed and steering
-	Body* player = game->getPlayer();
-	KinematicSeek* steering_algorithm;
-	steering_algorithm = new KinematicSeek(myNPC, player);
+	// Create our target
+	Body* player = game->getPlayer(); // player = target
 
+	// spyGuy
+	KinematicSeek* steeringAlgorithm;
+	steeringAlgorithm = new KinematicSeek(spyGuy, player);
 	KinematicSteeringOutput* steering;
-	steering = steering_algorithm->getSteering();
-	myNPC->Update(deltaTime, steering);
+	steering = steeringAlgorithm->getSteering();
 
+	// blackHat
+	KinematicArrive* steeringAlgorithm2;
+	steeringAlgorithm2 = new KinematicArrive(blackHat, player);
+	KinematicSteeringOutput* steering2;
+	steering2 = steeringAlgorithm2->getSteering();
+
+	spyGuy->Update(deltaTime, steering);
+	blackHat->Update(deltaTime, steering2);
 
 	// Update player
 	game->getPlayer()->Update(deltaTime);
 }
 
 void Scene1::Render() {
-	SDL_Rect square{ 0,0,32,64 };
-	SDL_Rect square2{ 10,10,32,64 };
-	SDL_SetRenderDrawColor(renderer, 2, 0, 0, 0);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
 
 	// render any npc's
 	blinky->Render(0.15f);
 
-	///////////////////////////////
-
+	////////////////////////////////////////////////////////////////////
+	SDL_Rect square;
 	Vec3 screenCoords;
 	int w, h;
 	float scale = 0.15f;
 
-
-	SDL_QueryTexture(myNPC->getTexture(), nullptr, nullptr, &w, &h);
+	SDL_QueryTexture(spyGuy->getTexture(), nullptr, nullptr, &w, &h);
 	w = static_cast<int>(w * scale);
 	h = static_cast<int>(h * scale);
 
-	screenCoords = projectionMatrix * myNPC->getPos();
-	square.x = static_cast<int>( screenCoords.x - 0.5f * w);
+	screenCoords = projectionMatrix * spyGuy->getPos();
+	square.x = static_cast<int>(screenCoords.x - 0.5f * w);
 	square.y = static_cast<int>(screenCoords.y - 0.5f * h);
 	square.w = w;
 	square.h = h;
-
-	float orientation = myNPC->getOrientation() * 180.0f / M_PI;
-	SDL_RenderCopyEx(renderer, myNPC->getTexture(), &square, &square2, orientation
-	,nullptr, SDL_FLIP_NONE );
 	
+	float orientation = spyGuy->getOrientation() * 180.0f / M_PI;
+	//SDL_RenderCopyEx(renderer, spyGuy->getTexture(), nullptr, &square,
+		//			 orientation, nullptr, SDL_FLIP_NONE);
+	////////////////////////////////////////////////////////////////////
+	{
+		float scale = 0.5f;
+		SDL_QueryTexture(blackHat->getTexture(), nullptr, nullptr, &w, &h);
+		w = static_cast<int>(w * scale);
+		h = static_cast<int>(h * scale);
+
+		screenCoords = projectionMatrix * blackHat->getPos();
+		square.x = static_cast<int>(screenCoords.x - 0.5f * w);
+		square.y = static_cast<int>(screenCoords.y - 0.5f * h);
+		square.w = w;
+		square.h = h;
+		
+		float orientation = blackHat->getOrientation() * 180.0f / M_PI;
+		//SDL_RenderCopyEx(renderer, blackHat->getTexture(), nullptr, &square,
+			//			 orientation, nullptr, SDL_FLIP_NONE);
+	}
+	////////////////////////////////////////////////////////////////////
+
 	// render the player
 	game->RenderPlayer(0.10f);
 
