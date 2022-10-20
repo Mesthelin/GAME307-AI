@@ -2,17 +2,8 @@
 using namespace std;
 
 
-Graph::Graph() { // (int numNodes) {
-	//	// initialize matrix of cost to have correct number of nodes
-	//	// and to have 0.0 weights, i.e. "no connections"
-	//	cost.resize(numNodes);
-	//	for (unsigned int i = 0; i = numNodes; i++) {
-	//		cost[i].resize(numNodes);
-	//
-	//		for (unsigned int j = o; j < numNodes; j++) {
-	//			cost[i][j] = 0.0;	
-	//		}
-	//	}
+Graph::Graph() {
+
 }
 
 bool Graph::OnCreate(vector<Node*> nodes_) {
@@ -68,48 +59,43 @@ vector<int> Graph::neighbours(int fromNode) {
 	return result;
 }
 
-vector<int> Graph::Dijkstra(int startNode, int goalNode) {
-	// helper variables
-	float new_cost;
-	int current;
+//vector<int> Graph::AStar(int startNode, int goalNode) {
+	//// helper variables
+	//float new_cost;
+	//int current;
 
-	// // declare current NodeAndPriority
-	// NodeAndPriority* currentNodeAndPriority;
-	// currentNodeAndPriority = new NodeAndPriority(startNode, 0.0f);
-	// 
-	// // setup priority queue for frontie of nodes
-	// priority_queue<NodeAndPriority, deque<NodeAndPriority>, ComparePriority> frontier; // copy from gitHub
-	// frontier.push(*currentNodeAndPriority);
+	//// declare current NodeAndPriority
+	//NodeAndPriority* currentNodeAndPriority;
+	//currentNodeAndPriority = new NodeAnPriority(startNode, 0.0f);
 
-	// track solution path
-	vector<int> came_from;
-	came_from.resize(numNodes());
+	//// setup priority queue for frontie of nodes
+	//priority_queue<NodeAndPriority, deque<NodeAndPriority>, ComparePriority> frontier; // copy from gitHub
+	//frontier.push(*currentNodeAndPriority);
 
-	// store cost so far to reach node
-	map<int, float> cost_so_far;  // easier to look up a spot in map rather than vector
-	cost_so_far[startNode] = 0.0f;
+	//// track solution path
+	//vector<int> came_from;
+	//came_from.resize(numNodes());
 
-	// TODO Algorithm
+	//// store cost so far to reach node
+	//map<int, float> cost_so_far;  // easier to look up a spot in map rather than vector
+	//cost_so_far[startNode] = 0.0f;
 
-	// start looping through the frontier
-	{
-		// get the node from the top of the frontier, put it in "current"
-		// pop it off
-		
+	//// TODO Algorithm
 
-		// if its the goal, then break out of loop
-		// for the neighbours of current node
-		{
-			// calculate new_cost
-			// if neighbour is not in cost_so_far OR new_cost is lower
-			{
-				// found a better path so update structure(pseudo code)
-			}
-		}
-	}
+	//// start looping through the frontier
+	//{
+	//	// get the node from the top of the frontier, put it in "current"
+	//	// pop it off
+	//	// if its the goal, then break out of loop
+	//	// for the neighbours of current node
+	//	{
+	//		// calculate new_cost
+	//		// if neighbour is not in cost_so_far OR new_cost is lower
+	//		{
+	//			// found a better path so update structure(pseudo code)
+	//		}
+	//	}
+	//}
 
-
-
-
-	return came_from;
-}
+	//return came_from;
+//}

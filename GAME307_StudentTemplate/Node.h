@@ -1,29 +1,33 @@
 #ifndef NODE_H
 #define NODE_H
 
+#include "MMath.h"
 
-//class Node {
-//public:
-//    // member variables
-//    int label;
-//
-//    // constructors
-//    Node();
-//    Node(int i_);
-//
-//    // useful functions
-//    void print();
-//};
+using namespace std;
+using namespace MATH;
 
 
- class Node {
- private:
- 	int label;
- 
- public:
- 	Node(int label_) { label = label_; } // inline
- 	~Node() {};
- 	int getLabel() { return label; }
- };
+class Tile;
 
-#endif // NODE_H //
+class Node {
+private:
+	int label;
+	Vec3 position;
+	Tile* tile;
+
+public:
+	Node(int label_, Vec3 position_ = Vec3()) {
+		label = label_;
+		position = position_;
+		tile = NULL;
+	}
+	~Node() {};
+
+	int getLabel() { return label; }
+	Vec3 getPos() { return position; }
+
+	void setTile(Tile* tile_) { tile = tile_; }
+	Tile* getTile() { return tile; }
+};
+
+#endif // NODE_H // GOOOOOOOOOOD

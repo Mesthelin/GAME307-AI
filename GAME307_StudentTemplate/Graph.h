@@ -28,12 +28,7 @@ public:
 
 	void addWeightedConnection(int fromNode, int toNode, float weight);
 	vector<int>neighbours(int fromNode);
-	vector<int>Dijkstra(int startNode, int goalNode);
-
-	//list<int> neighbours(int fromNode);
-	//void addToNodeList(Node* n);
-	//void clearWeight();
-
+	//vector<int>AStar(int startNode, int goalNode);
 };
 
 #endif // GRAPH //
