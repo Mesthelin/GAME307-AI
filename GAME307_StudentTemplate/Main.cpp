@@ -1,4 +1,5 @@
 #include <iostream>
+#include <asio.hpp>
 #include "GameManager.h"
 
 
@@ -15,3 +16,4 @@ int main(int argc, char* args[]) { /// Standard C-style entry point, you need to
 	return 0;
 
 }
+
