@@ -12,77 +12,102 @@ Scene2::Scene2(SDL_Window* sdlWindow_, GameManager* game_){
 Scene2::~Scene2() {}
 
 bool Scene2::OnCreate() {
+	int w, h;
+	SDL_GetWindowSize(window, &w, &h);
 
-	//			0
-	//			|
-	//	  1 --- 2 --- 3
-	//			|
-	//			4
+	Matrix4 ndc = MMath::viewportNDC(w, h);
+	Matrix4 ortho = MMath::orthographic(0.0f, xAxis, 0.0f, yAxis, 0.0f, 1.0f);
+	projectionMatrix = ndc * ortho;
+	inverseProjection = MMath::inverse(projectionMatrix);
 
-	int count = 5;
-	nodes.resize(count); // private variable
-	
-	// create nodes
-	for (int i = 0; i < count; i++) {
+	// turn on SDL imaging
+	IMG_Init(IMG_INIT_PNG);
 
-		nodes[i] = new Node(i); // new node with label 'i' from Node.h
-	}
-
-	// since nodes are created here, 
-	// then Scene is responsible for deleting them later on
+	// create tile with node
+	int rows = ceil(yAxis / tileHeight);
+	int cols = ceil(xAxis / tileWidth);
+	// create tiles and populate nodes list
+	createTiles(rows, cols);
 
 	// create Graph
 	graph = new Graph(); // vector of node pointers
 	if (!graph->OnCreate(nodes)) {
+		cout << "Failed!\n";
 		return false;
 	}
 
-
-	// create connections from 0
-	graph->addWeightedConnection(nodes[0]->getLabel(),
-							   nodes[2]->getLabel(),
-							   1.0f);
-
-	// connections from 1
-	graph->addWeightedConnection(nodes[1]->getLabel(),
-							   nodes[2]->getLabel(),
-							   1.0f);
-
-	// connections from 2
-	graph->addWeightedConnection(nodes[2]->getLabel(),
-							   nodes[0]->getLabel(),
-							   1.0f);
-
-	graph->addWeightedConnection(nodes[2]->getLabel(),
-							   nodes[1]->getLabel(),
-							   1.0f);
-
-	graph->addWeightedConnection(nodes[2]->getLabel(),
-							   nodes[3]->getLabel(),
-							   1.0f);
-
-	graph->addWeightedConnection(nodes[2]->getLabel(),
-							   nodes[4]->getLabel(),
-							   1.0f);
-
-	// connections from 3
-	graph->addWeightedConnection(nodes[3]->getLabel(),
-							   nodes[2]->getLabel(),
-							   1.0f);
-
-	// connections from 4
-	graph->addWeightedConnection(nodes[4]->getLabel(),
-							   nodes[2]->getLabel(),
-							   1.0f);
-
-
-	cout << "naighbours of 2:\n";
-	for (int nodeLabel : graph->neighbours(2)) {
-
-		cout << "Node " << nodeLabel << "\n";
-	}
+	calculateConnectionWeights();
 
 	return true;
+}
+
+void Scene2::createTiles(int rows, int cols) {
+	tiles.resize(rows);
+	for (int i = 0; i < rows; i++) {
+		tiles[i].resize(cols);
+	}
+
+	Node* n;
+	Tile* t;
+	int i, j, label;
+	i = 0; // along y(rows)
+	j = 0; // along x(columns)
+	label = 0;
+
+	for (float y = 0.5f * tileHeight; y < yAxis; y += tileHeight) {
+		// do stuff for row, where y stays constant
+		for (float x = 0.5f * tileWidth; x < xAxis; x += tileWidth) {
+
+			n = new Node(label, Vec3(x, y, 0.0f));
+			t = new Tile(n, tileWidth, tileHeight, this);
+			n->setTile(t);
+			nodes.push_back(n);
+			tiles[i][j] = t;
+
+			label++;
+			j++;
+		}
+		j = 0;
+		i++;
+	}
+}
+
+void Scene2::calculateConnectionWeights() {
+	int rows = tiles.size();
+	int cols = tiles[0].size();
+
+	for (int i = 0; i < rows; i++) {
+
+		for (int j = 0; j < cols; j++) {
+
+			//				i+1, j
+			//	i, j-1		  i, j		i, j+1
+			//				i-1, j
+
+			int from = tiles[i][j]->getNode()->getLabel();
+
+			// left is i, j-1
+			if (j > 0) {
+				int to = tiles[i][j - 1]->getNode()->getLabel();
+				graph->addWeightedConnection(from, to, tileWidth);
+			}
+			// right is i, j+1
+			if (j < cols - 1) {
+				int to = tiles[i][j + 1]->getNode()->getLabel();
+				graph->addWeightedConnection(from, to, tileWidth);
+			}
+			// above is i+1, j
+			if (i < rows - 1) {
+				int to = tiles[i + 1][j]->getNode()->getLabel();
+				graph->addWeightedConnection(from, to, tileWidth);
+			}
+			// below is i-1, j
+			if (i > 0) {
+				int to = tiles[i - 1][j]->getNode()->getLabel();
+				graph->addWeightedConnection(from, to, tileWidth);
+			}
+		}
+	}
 }
 
 void Scene2::OnDestroy() {
@@ -92,6 +117,21 @@ void Scene2::OnDestroy() {
 
 void Scene2::Update(const float deltaTime) {}
 
-void Scene2::Render() {}
+void Scene2::Render() {
+	//clear frame
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0); // GOOD
+	SDL_RenderClear(renderer);
+
+	// render all tiles
+	for (int i = 0; i < tiles.size(); i++) {
+
+		for (int j = 0; j < tiles[i].size(); j++) {
+			tiles[i][j]->Render();
+		}
+	}
+
+	// Render it all
+	SDL_RenderPresent(renderer);
+}
 
 void Scene2::HandleEvents(const SDL_Event& event) {}
