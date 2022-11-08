@@ -134,4 +134,6 @@ void Scene2::Render() {
 	SDL_RenderPresent(renderer);
 }
 
-void Scene2::HandleEvents(const SDL_Event& event) {}
+void Scene2::HandleEvents(const SDL_Event& event) {
+
+}

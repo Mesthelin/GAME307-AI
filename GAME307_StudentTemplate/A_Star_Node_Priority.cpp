@@ -10,13 +10,10 @@
 #include "Node.h"
 #include "A_Star_Node_Priority.h"
 
-A_Star_Node_Priority::A_Star_Node_Priority( Node *node_, float priority_ )
+A_Star_Node_Priority::A_Star_Node_Priority( int node_, float priority_ )
 {
     node = node_;
     priority = priority_;
 }
 
-void A_Star_Node_Priority::print()
-{
-    printf( "Node: %i, priority: %.2f \n", node->getLabel(), priority);
-}
+

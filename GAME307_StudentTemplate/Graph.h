@@ -6,6 +6,7 @@
 #include <list>
 #include <queue>
 #include "Node.h"
+#include "A_Star_Node_Priority.h"
 using namespace std;
 
 
@@ -24,11 +25,20 @@ public:
 	bool OnCreate(vector<Node*> nodes_);
 	int numNodes();
 
-	Node* getNode(int label) { return node[label]; }
-
 	void addWeightedConnection(int fromNode, int toNode, float weight);
+	
+	Node* getNode(int label) { return node[label]; }
 	vector<int>neighbours(int fromNode);
-	//vector<int>AStar(int startNode, int goalNode);
+	vector<int>AStar(int startNode, int goalNode);
+
+	// create struct with one operation, for use in the comparisons needed by the priority queue
+	// (might be better to have in a separate file and included?)
+	struct ComparePriority {
+		bool operator()(A_Star_Node_Priority const& lhs, A_Star_Node_Priority const& rhs) {
+			// make it a min queue
+			return lhs.priority > rhs.priority;
+		}
+	};
 };
 
 #endif // GRAPH //

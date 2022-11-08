@@ -7,11 +7,11 @@ Graph::Graph() {
 }
 
 bool Graph::OnCreate(vector<Node*> nodes_) {
-
-
+	
+	
 	// ASSUMPTION: nodes_ vector has the node with label "i" in the [i] position of the vector
-
-
+	
+	
 	// given list of nodes, initialize a matrix of costs with 0.0 weights
 	int numNodes = nodes_.size();
 
@@ -59,43 +59,56 @@ vector<int> Graph::neighbours(int fromNode) {
 	return result;
 }
 
-//vector<int> Graph::AStar(int startNode, int goalNode) {
-	//// helper variables
-	//float new_cost;
-	//int current;
+vector<int> Graph::AStar(int startNode, int goalNode) {
+	// helper variables
+	float new_cost;
+	int current;
 
-	//// declare current NodeAndPriority
-	//NodeAndPriority* currentNodeAndPriority;
-	//currentNodeAndPriority = new NodeAnPriority(startNode, 0.0f);
+	// declare current NodeAndPriority
+	A_Star_Node_Priority* currentNodeAndPriority;
+	currentNodeAndPriority = new A_Star_Node_Priority(startNode, 0.0f);
 
-	//// setup priority queue for frontie of nodes
-	//priority_queue<NodeAndPriority, deque<NodeAndPriority>, ComparePriority> frontier; // copy from gitHub
-	//frontier.push(*currentNodeAndPriority);
+	// setup priority queue for frontie of nodes
+	priority_queue<A_Star_Node_Priority, deque<A_Star_Node_Priority>, ComparePriority> frontier; // copy from gitHub
+	frontier.push(*currentNodeAndPriority);
 
-	//// track solution path
-	//vector<int> came_from;
-	//came_from.resize(numNodes());
+	// track solution path
+	vector<int> came_from;
+	came_from.resize(numNodes());
 
-	//// store cost so far to reach node
-	//map<int, float> cost_so_far;  // easier to look up a spot in map rather than vector
-	//cost_so_far[startNode] = 0.0f;
+	// store cost so far to reach node
+	map<int, float> cost_so_far;  // easier to look up a spot in map rather than vector
+	cost_so_far[startNode] = 0.0f;
 
 	//// TODO Algorithm
 
 	//// start looping through the frontier
-	//{
-	//	// get the node from the top of the frontier, put it in "current"
-	//	// pop it off
-	//	// if its the goal, then break out of loop
-	//	// for the neighbours of current node
-	//	{
-	//		// calculate new_cost
-	//		// if neighbour is not in cost_so_far OR new_cost is lower
-	//		{
-	//			// found a better path so update structure(pseudo code)
-	//		}
-	//	}
-	//}
+	while (!frontier.empty()) {
+		// get the node from the top of the frontier, put it in "current"
+		current = frontier.top().node;
+		// pop it off
+		frontier.pop();
+		// if its the goal, then break out of loop
+		if (current == goalNode) {
+			break;
+		}
 
-	//return came_from;
-//}
+		// for the neighbours of current node
+		for (auto next : neighbours(current)) {
+			// calculate new_cost
+			new_cost = cost_so_far[current] + cost[current][next];
+			// if neighbour is not in cost_so_far OR new_cost is lower
+			if (!cost_so_far.count(next) || new_cost < cost_so_far[next]) {
+
+				cost_so_far[next] = new_cost;
+				float priority = new_cost;
+				currentNodeAndPriority = new A_Star_Node_Priority(next, priority);
+				frontier.push(*currentNodeAndPriority);
+				came_from[next] = current;
+			}
+			// found a better path so update structure(pseudo code)		
+		}
+
+		return came_from;
+	}
+}
