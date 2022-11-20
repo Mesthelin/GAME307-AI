@@ -2,22 +2,35 @@
 #define CHARACTER_H
 #include <vector>
 #include "Scene.h"
-#include "Seek.h"
+
+#include "Flee.h"
 #include "KinematicBody.h"
+#include "Seek.h"
 #include "SteeringBehaviour.h"
 
+#include "Action.h"
+#include "Decision.h"
+#include "PlayerInRangeDecision.h"
+#include "StateMachine.h"
 using namespace std;
 
+
+class DecisionTreeNode;
 class Character {
 private:
 	class KinematicBody* body;
 	class Scene* scene;
+
+	DecisionTreeNode* decider;
+	StateMachine* stateMachine;
 
 public:
 	Character() {
 
 		body = NULL;
 		scene = NULL;
+		decider = NULL;
+		stateMachine = NULL;
 	};
 
 	// TODO add constructor that takes parameters for the body
@@ -37,7 +50,13 @@ public:
 	void HandleEvents(const SDL_Event& event);
 	void Render(float scale = 1.0f);
 	void steerToSeekPlayer(SteeringOutput *steering);
+
+	Vec3 getPos() { return body->getPos(); }
+	Vec3 getPlayerPos() { return scene->game->getPlayer()->getPos(); }
+	
+	bool readDecisionTreeXML(string filename);
+	bool readStateMachineXML(string filename);
+
 };
 
 #endif
-

@@ -7,6 +7,11 @@
 #include "Node.h"
 #include "Scene.h"
 
+enum TILE_STATE {
+	WALKABLE = 0,
+	PATH
+};
+
 
 class Tile {
 private:
@@ -14,6 +19,8 @@ private:
 	float width;
 	float height;
 	Uint8 r, g, b, a;
+	TILE_STATE state;
+	
 
 	Scene* scene;
 
@@ -26,7 +33,7 @@ private:
 
 public:
 
-	Tile(Node* node_, float width_, float height_, Scene* scene_) {
+	Tile(Node* node_, float width_, float height_, Scene* scene_, TILE_STATE state_) {
 		node = node_;
 		width = width_;
 		height = height_;
@@ -35,6 +42,7 @@ public:
 		b = 255;
 		a = 255;
 		scene = scene_;
+		state = state_;
 	}
 
 	~Tile() {}

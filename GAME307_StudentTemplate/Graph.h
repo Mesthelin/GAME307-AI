@@ -6,7 +6,7 @@
 #include <list>
 #include <queue>
 #include "Node.h"
-#include "A_Star_Node_Priority.h"
+#include "NodeAndPriority.h"
 using namespace std;
 
 
@@ -34,7 +34,7 @@ public:
 	// create struct with one operation, for use in the comparisons needed by the priority queue
 	// (might be better to have in a separate file and included?)
 	struct ComparePriority {
-		bool operator()(A_Star_Node_Priority const& lhs, A_Star_Node_Priority const& rhs) {
+		bool operator()(NodeAndPriority const& lhs, NodeAndPriority const& rhs) {
 			// make it a min queue
 			return lhs.priority > rhs.priority;
 		}

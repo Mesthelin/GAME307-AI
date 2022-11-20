@@ -59,7 +59,7 @@ void Scene2::createTiles(int rows, int cols) {
 		for (float x = 0.5f * tileWidth; x < xAxis; x += tileWidth) {
 
 			n = new Node(label, Vec3(x, y, 0.0f));
-			t = new Tile(n, tileWidth, tileHeight, this);
+			t = new Tile(n, tileWidth, tileHeight, this, WALKABLE);
 			n->setTile(t);
 			nodes.push_back(n);
 			tiles[i][j] = t;
@@ -135,5 +135,22 @@ void Scene2::Render() {
 }
 
 void Scene2::HandleEvents(const SDL_Event& event) {
+	if (event.type == SDL_KEYDOWN && event.key.repeat == 0) {
+		switch (event.key.keysym.scancode) {
 
+			case SDL_SCANCODE_F1:
+				vector<int> camefrom;
+				camefrom = graph->AStar(23, 17);
+				 // TODO 
+				 // use the camefrom array to set the state of the tiles on the path
+				while (WALKABLE) {
+					SDL_SetRenderDrawColor(renderer, 1.0f, 0.0f, 0.0f, 1.0f);
+				}
+
+				 // TODO
+				 // in the tile class, change colours used in rendering based on the state
+				cout << "Test!\n";
+				break;
+		}
+	}
 }

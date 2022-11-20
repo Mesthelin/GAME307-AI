@@ -1,17 +1,15 @@
 #include "Character.h"
 
-bool Character::OnCreate(Scene* scene_)
-{
+bool Character::OnCreate(Scene* scene_) {
 	scene = scene_;
 
 	// Configure and instantiate the body to use for the demo
-	if (!body)
-	{
+	if (!body) {
 		float radius = 0.2;
 		float orientation = 0.0f;
 		float rotation = 0.0f;
 		float angular = 0.0f;
-		float maxSpeed = 4.0f;
+		float maxSpeed = 3.0f;
 		float maxAcceleration = 10.0f;
 		float maxRotation = 2.0f;
 		float maxAngular = 10.0f;
@@ -28,25 +26,69 @@ bool Character::OnCreate(Scene* scene_)
 		);
 	}
 
-	if (!body)
-	{
+	if (!body) {
 		return false;
 	}
 
 	return true;
 }
 
-void Character::Update(float deltaTime)
-{
+bool Character::readStateMachineXML(string filename) {
+	stateMachine = new StateMachine(this);
+
+	State* seekPlayer = new State(STATE::SEEK);
+	State* doNothing = new State(STATE::DO_NOTHING);
+
+	Condition* ifInRange = new ConditionInRange(this);
+	doNothing->addTransition(new Transition(ifInRange, seekPlayer));
+	
+	Condition* ifOutOfRange = new ConditionOutOfRange(this);
+	seekPlayer->addTransition(new Transition(ifOutOfRange, doNothing));
+
+	stateMachine->setInitialState(doNothing);
+
+	return true;
+}
+
+bool Character::readDecisionTreeXML(string filename) {
+	// pretend XML produced these instances
+	if (filename == "playerinrange.xml") {
+		DecisionTreeNode* falseNode = new Action(ACTION_SET::DO_NOTHING);
+		DecisionTreeNode* trueNode = new Action(ACTION_SET::SEEK);
+
+		decider = new PlayerInRangeDecision(this, trueNode, falseNode);
+	}
+	return true;
+}
+
+void Character::Update(float deltaTime) {
 	// create a new overall steering output
 	SteeringOutput* steering;
 	steering = new SteeringOutput();
 
-	// set the target for steering; target is used by the steerTo... functions
-	// (often the target is the Player)
+	// calculate and set calues in the overall steering output
+	if (decider) {
+		DecisionTreeNode* action = decider->makeDecision();
+		Action* a = dynamic_cast<Action*>(action);
+		switch (a->getValue()) {
+			case ACTION_SET::SEEK:
+				steerToSeekPlayer(steering);
+				break;
+			case ACTION_SET::DO_NOTHING:
+				break;
+		}
+	}
 
-	// using the target, calculate and set values in the overall steering output
-	steerToSeekPlayer(steering);
+	if (stateMachine) {
+		stateMachine->update();
+		switch (stateMachine->getCurrentStateName()) {
+			case STATE::SEEK:
+				steerToSeekPlayer(steering);
+				break;
+			case STATE::DO_NOTHING:
+				break;
+		}
+	}
 
 	// apply the steering to the equations of motion
 	body->Update(deltaTime, steering);
@@ -56,17 +98,17 @@ void Character::Update(float deltaTime)
 	if (steering) delete steering;
 }
 
-void Character::steerToSeekPlayer(SteeringOutput *steering) {
-	vector<SteeringOutput *> steering_outputs;
-	PlayerBody *target = scene->game->getPlayer();
+void Character::steerToSeekPlayer(SteeringOutput* steering) {
+	vector<SteeringOutput*> steering_outputs;
+	PlayerBody* target = scene->game->getPlayer();
 
-	SteeringBehaviour *steering_algorithm = new Seek(body, target);
+	SteeringBehaviour* steering_algorithm = new Seek(body, target);
 	steering_outputs.push_back(steering_algorithm->getSteering());
 
 	// Add together any steering outputs
 	for (unsigned i = 0; i < steering_outputs.size(); i++) {
-		if (steering_outputs [i]) {
-			*steering += *steering_outputs [i];
+		if (steering_outputs[i]) {
+			*steering += *steering_outputs[i];
 		}
 	}
 
@@ -76,13 +118,11 @@ void Character::steerToSeekPlayer(SteeringOutput *steering) {
 	}
 }
 
-void Character::HandleEvents(const SDL_Event& event)
-{
+void Character::HandleEvents(const SDL_Event& event) {
 	// handle events here, if needed
 }
 
-void Character::Render(float scale)
-{
+void Character::Render(float scale) {
 	SDL_Renderer* renderer = scene->game->getRenderer();
 	Matrix4 projectionMatrix = scene->getProjectionMatrix();
 
@@ -104,5 +144,5 @@ void Character::Render(float scale)
 	float orientation = body->getOrientation() * 180.0f / M_PI;
 
 	SDL_RenderCopyEx(renderer, body->getTexture(), nullptr, &square,
-		orientation, nullptr, SDL_FLIP_NONE);
+					 orientation, nullptr, SDL_FLIP_NONE);
 }

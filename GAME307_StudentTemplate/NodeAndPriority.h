@@ -1,17 +1,17 @@
 //
-//  A_Star_Node_Priority.h
+//  NodeAndPriority.h
 //  Demo Priority Queue
 //
 //  Created by Gail Harris on 2020-Oct-11.
 //  Copyright © 2020 Gail Harris. All rights reserved.
 //
 
-#ifndef A_Star_Node_Priority_h
-#define A_Star_Node_Priority_h
+#ifndef NODE_AND_PRIORITY_H
+#define NODE_AND_PRIORITY_H
 
 #include "node.h"
 
-class A_Star_Node_Priority
+class NodeAndPriority
 {
 public:
     
@@ -21,7 +21,7 @@ public:
     float priority;
     
     // constructors
-    A_Star_Node_Priority( int node_, float priority);
+    NodeAndPriority( int node_, float priority);
 };
 
-#endif /* A_Star_Node_Priority_h */
+#endif /* NodeAndPriority_h */

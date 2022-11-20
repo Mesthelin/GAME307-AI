@@ -65,11 +65,11 @@ vector<int> Graph::AStar(int startNode, int goalNode) {
 	int current;
 
 	// declare current NodeAndPriority
-	A_Star_Node_Priority* currentNodeAndPriority;
-	currentNodeAndPriority = new A_Star_Node_Priority(startNode, 0.0f);
+	NodeAndPriority* currentNodeAndPriority;
+	currentNodeAndPriority = new NodeAndPriority(startNode, 0.0f);
 
-	// setup priority queue for frontie of nodes
-	priority_queue<A_Star_Node_Priority, deque<A_Star_Node_Priority>, ComparePriority> frontier; // copy from gitHub
+	// setup priority queue for frontier of nodes
+	priority_queue<NodeAndPriority, deque<NodeAndPriority>, ComparePriority> frontier; // copy from gitHub
 	frontier.push(*currentNodeAndPriority);
 
 	// track solution path
@@ -98,17 +98,17 @@ vector<int> Graph::AStar(int startNode, int goalNode) {
 			// calculate new_cost
 			new_cost = cost_so_far[current] + cost[current][next];
 			// if neighbour is not in cost_so_far OR new_cost is lower
-			if (!cost_so_far.count(next) || new_cost < cost_so_far[next]) {
+			//if (!cost_so_far.count(next) || new_cost < cost_so_far[next]) {
+			if (cost_so_far.count(next) == 0 || new_cost < cost_so_far[next]) {
 
 				cost_so_far[next] = new_cost;
 				float priority = new_cost;
-				currentNodeAndPriority = new A_Star_Node_Priority(next, priority);
+				currentNodeAndPriority = new NodeAndPriority(next, priority);
 				frontier.push(*currentNodeAndPriority);
 				came_from[next] = current;
 			}
 			// found a better path so update structure(pseudo code)		
 		}
-
-		return came_from;
 	}
+		return came_from;
 }

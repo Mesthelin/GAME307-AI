@@ -61,6 +61,8 @@ bool Scene1::OnCreate() {
 		blinky->setTexture(texture);
 		SDL_FreeSurface(image);
 	}
+	//blinky->readDecisionTreeXML("playerinrange.xml");
+	blinky->readStateMachineXML("some.xml");
 
 	////////////////////////////////////////////////////////////////////
 	Vec3 position = Vec3(15.0f, 8.0f, 0.0f);
