@@ -25,6 +25,8 @@ private:
 	class Scene *currentScene;
     class PlayerBody *player;
     Uint32 changeSceneEventType; // event type number for user defined events
+    Uint32 changeSceneEventType1; // event type number for user defined events
+    Uint32 changeSceneEventType2; // event type number for user defined events
 
 public:
 	GameManager();
@@ -36,6 +38,8 @@ public:
 	Matrix4 getProjectionMatrix();
     PlayerBody* getPlayer(){ return player; }
 	Uint32 getChangeScene() { return changeSceneEventType; }
+	Uint32 getChangeScene1() { return changeSceneEventType1; }
+	Uint32 getChangeScene2() { return changeSceneEventType2; }
 
 	SDL_Renderer* getRenderer();
 	void RenderPlayer(float scale = 1.0f);

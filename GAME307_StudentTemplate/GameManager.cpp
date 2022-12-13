@@ -1,6 +1,8 @@
 #include "GameManager.h"
 #include "Scene1.h"
 #include "Scene2.h"
+#include "MainMenuScreen.h"
+#include "CreditsMenuScreen.h"
 
 GameManager::GameManager() {
 	windowPtr = nullptr;
@@ -38,7 +40,7 @@ bool GameManager::OnCreate() {
 
     // select scene for specific assignment
 
-    currentScene = new Scene2(windowPtr->GetSDL_Window(), this);
+    currentScene = new MainMenuScreen(windowPtr->GetSDL_Window(), this);
     
     // create player
     float mass = 1.0f;
@@ -89,6 +91,20 @@ bool GameManager::OnCreate() {
         OnDestroy();
         return false;
     }
+
+    changeSceneEventType1 = SDL_RegisterEvents(1);
+    if (changeSceneEventType1 == ((Uint32)-1))
+    {
+        OnDestroy();
+        return false;
+    }
+
+    changeSceneEventType2 = SDL_RegisterEvents(1);
+    if (changeSceneEventType2 == ((Uint32)-1))
+    {
+        OnDestroy();
+        return false;
+    }
        
 	return true;
 }
@@ -116,6 +132,44 @@ void GameManager::Run() {
             {
                 isRunning = false;
             }
+
+            else if (event.type == changeSceneEventType)
+            {
+
+                currentScene->OnDestroy();
+                delete currentScene;
+                currentScene = new Scene1(windowPtr->GetSDL_Window(), this);
+                if (!currentScene->OnCreate())
+                {
+                    isRunning = false;
+                }
+
+            }
+
+            else if (event.type == changeSceneEventType1)
+            {
+
+                currentScene->OnDestroy();
+                delete currentScene;
+                currentScene = new CreditsMenuScreen(windowPtr->GetSDL_Window(), this);
+                if (!currentScene->OnCreate())
+                {
+                    isRunning = false;
+                }
+
+            }
+            else if (event.type == changeSceneEventType2)
+            {
+
+                currentScene->OnDestroy();
+                delete currentScene;
+                currentScene = new MainMenuScreen(windowPtr->GetSDL_Window(), this);
+                if (!currentScene->OnCreate())
+                {
+                    isRunning = false;
+                }
+            }
+
             else if( event.type == SDL_KEYDOWN )
             {
                 switch ( event.key.keysym.scancode )
@@ -141,6 +195,14 @@ void GameManager::Run() {
                         launched = false;
                         LoadScene(2);
                         break;
+                    case SDL_SCANCODE_3:
+                        launched = false;
+                        LoadScene(3);
+                        break;
+                    case SDL_SCANCODE_4:
+                        launched = false;
+                        LoadScene(4);
+                        break;
                     default:
                         break;
                 }
@@ -158,7 +220,7 @@ void GameManager::Run() {
 		/// Keep the event loop running at a proper rate
 		SDL_Delay(timer->GetSleepTime(60)); ///60 frames per sec
 	}
-}
+};
 
 GameManager::~GameManager() {}
 
@@ -196,9 +258,15 @@ void GameManager::LoadScene( int i )
     switch ( i )
     {
         case 1:
-            currentScene = new Scene1( windowPtr->GetSDL_Window(), this);
+            currentScene = new MainMenuScreen(windowPtr->GetSDL_Window(), this);
             break;
         case 2:
+            currentScene = new CreditsMenuScreen(windowPtr->GetSDL_Window(), this);
+            break;
+        case 3:
+            currentScene = new Scene1( windowPtr->GetSDL_Window(), this);
+            break;
+        case 4:
             currentScene = new Scene2(windowPtr->GetSDL_Window(), this);
             break;
         default:
